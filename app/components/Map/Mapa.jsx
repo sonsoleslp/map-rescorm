@@ -6,7 +6,6 @@ import ReactResizeDetector from 'react-resize-detector';
 export default class Mapa extends React.Component {
   constructor(props){
     super(props);
-    this.handleClick = this.handleClick.bind(this);
     this.aspectRatio = this.aspectRatio.bind(this);
     this.state = {
       width: 100,
@@ -15,19 +14,11 @@ export default class Mapa extends React.Component {
   }
   render(){
     return <div id="map">
-      <Map data={spain} width={this.state.width} height={this.state.height} handleClick={this.handleClick}/>
-      <ReactResizeDetector handleWidth handleHeight onResize={(w,h)=>{
-        this.aspectRatio(w,h);
+      <Map answers={this.props.answers} data={spain} width={this.state.width} height={this.state.height} handleClick={this.props.onAnswerQuestion}/>
+      <ReactResizeDetector handleWidth handleHeight onResize={(w, h)=>{
+        this.aspectRatio(w, h);
       }} />
     </div>;
-  }
-
-  handleClick(){
-
-  }
-
-  componentDidMount(){
-
   }
 
   aspectRatio(width, height) {

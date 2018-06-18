@@ -1,9 +1,15 @@
 #map {
   text-align: center;
-  height: 100%;
+  height: calc(100% - 80px);
   text {
     font-size: 8px !important;
     z-index: 9999 !important;
     font-family: "Roboto" !important;
+  }
+}
+
+@media (max-width: 600px) {
+  #map  {
+    height: calc(100% - 115px);
   }
 }

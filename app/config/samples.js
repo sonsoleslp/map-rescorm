@@ -19,9 +19,9 @@ function shuffle(array){
 
 // Used like so
 let arr = [
-  "Alava", "Albacete", "Alicante", "Almeria", "Asturias", "Avila", "Badajoz", "Barcelona", "Burgos", "Caceres",
-  "Cadiz", "Cantabria", "Castellon", "Ciudad Real", "Cordoba", "A Coruna", "Cuenca", "Girona", "Granada", "Guadalajara",
-  "Guipuzcoa", "Huelva", "Huesca", "Baleares", "Jaen", "Leon", "Lleida", "Lugo", "Madrid", "Malaga", "Murcia", "Navarra",
+  "Álava", "Albacete", "Alicante", "Almería", "Asturias", "Ávila", "Badajoz", "Barcelona", "Burgos", "Cáceres",
+  "Cádiz", "Cantabria", "Castellón", "Ciudad Real", "Córdoba", "A Coruña", "Cuenca", "Girona", "Granada", "Guadalajara",
+  "Guipúzcoa", "Huelva", "Huesca", "Baleares", "Jaén", "León", "Lleida", "Lugo", "Madrid", "Málaga", "Murcia", "Navarra",
   "Palencia", "Las Palmas", "Pontevedra", "Ourense", "La Rioja", "Salamanca", "Segovia", "Sevilla", "Soria", "Tarragona",
   "Santa Cruz de Tenerife", "Teruel", "Toledo", "Valencia", "Valladolid", "Vizcaya", "Zamora", "Zaragoza", "Ceuta", "Melilla",
 ];

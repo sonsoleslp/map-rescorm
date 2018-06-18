@@ -1,7 +1,10 @@
+$maincolor: #17CFC8;
+
 html, body, #root, #container {
   height: 100%;
   padding: 0;
   margin: 0;
+  font-family: "Roboto", sans-serif !important;
 }
 
 div {
@@ -10,9 +13,13 @@ div {
 }
 
 body {
-  background-color: white;
+  background-color: #555;
 }
 
+
+.mainColor {
+  color: $maincolor;
+}
 div.header_wrapper img {
   width: 71px;
   height: 50px;
@@ -43,4 +50,120 @@ div.header_wrapper img {
 
 .quiz {
   height:100%;
+}
+#nav {
+  height: 50px;
+  margin-bottom: 10px;
+  background-color: #333;
+  font-size: 1.7em;
+  line-height: 50px;
+  padding-left: 10px;
+  color: white;
+  #logo {
+    height: 30px;
+    padding-right: 10px;
+    vertical-align: text-bottom;
+
+  }
+  span {
+    vertical-align: middle;
+  }
+}
+
+
+#gamePanel {
+  position: absolute;
+  width: 250px;
+  z-index: 9999;
+  margin: 10px;
+  //padding: 5px;
+  background-color: white;
+  display: flex;
+  flex-flow: row wrap;
+  #question {
+    text-align: center;
+    flex: 2 0px;
+    order: 2;
+    padding: 6px;
+  }
+  * {
+    flex: 1 100%;
+  }
+  .arrow {
+    flex: 1 auto;
+    button {
+      background: transparent;
+      border: none;
+      padding: 8px;
+      cursor:pointer;
+      outline: none;
+      height: 100%;
+      img {
+        width: 15px;
+        cursor:pointer;
+        vertical-align: middle;
+        &:hover {
+          transform: scale(1.5);
+          -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+          filter: grayscale(100%);
+        }
+
+      }
+    }
+  }
+  .leftarrow {
+    order: 1;
+    text-align: left;
+
+  }
+  .rightarrow {
+    order: 3;
+    text-align: right;
+  }
+}
+@media (max-width: 600px) {
+  #gamePanel  {
+    position: relative;
+    width: 100%;
+    margin: 0px;
+
+  }
+  #nav {
+    margin: 0px;
+  }
+}
+
+#navBarRightContainer {
+  display: inline-block;
+  position: absolute;
+  right: 15px;
+  top: 0px;
+  #progressBar {
+    display: inline-block;
+    width: 100px;
+    background-color: white;
+    height: 15px;
+    position:relative;
+    vertical-align: middle;
+    #completedProgress{
+      position:absolute;
+      background-color: $maincolor;
+      height: 100%;
+      display: inline-block;
+    }
+    //box-shadow: 2px 2px #333;
+  }
+  #progressNumber {
+    color:$maincolor;
+    font-size: 18px;
+    margin-right: 4px;
+  }
+  #timerContainer {
+    display: inline-block;
+    #timer {
+      height: 15px;
+      font-size: 18px;
+    }
+    margin-right: 4px;
+  }
 }

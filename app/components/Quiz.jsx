@@ -2,20 +2,23 @@ import React from 'react';
 import './../assets/scss/quiz.scss';
 
 import * as Utils from '../vendors/Utils.js';
-import {addObjectives, resetObjectives, finishApp} from './../reducers/actions';
+import {addObjectives, resetObjectives, finishApp, objectiveAccomplished, objectiveAccomplishedThunk} from './../reducers/actions';
 
 import QuizHeader from './QuizHeader.jsx';
-import MCQuestion from './MCQuestion.jsx';
 import Mapa from './Map/Mapa';
+import GamePanel from './GamePanel';
+import Progress from './Progress';
+import Timer from './Timer';
+import maplogo from '../assets/images/map.svg'
 export default class Quiz extends React.Component {
   constructor(props){
     super(props);
     let quiz = this.props.quiz;
-    let questions = quiz.questions;
+    let questions = [...quiz.questions];
 
     // Adaptive behaviour
     // Sort questions based on difficulty
-    let adaptive_sorted = false;
+   /* let adaptive_sorted = false;
     if((this.props.config.adaptive === true) && (typeof props.user_profile === "object") && (typeof props.user_profile.learner_preference === "object") && (typeof props.user_profile.learner_preference.difficulty === "number")){
       let difficulty = props.user_profile.learner_preference.difficulty;
       if((difficulty >= 0) && (difficulty <= 10)){
@@ -28,12 +31,12 @@ export default class Quiz extends React.Component {
         questions.sort(function(a, b){ return b.suitability - a.suitability; });
         adaptive_sorted = true;
       }
-    }
+    }*/
 
-    if(adaptive_sorted === false){
+   /* if(adaptive_sorted === false){
       questions = Utils.shuffleArray(questions);
     }
-
+    */
     if((typeof this.props.config.n === "number") && (this.props.config.n >= 1)){
       // Limit number of questions
       questions = questions.slice(0, Math.min(this.props.config.n, questions.length));
@@ -42,8 +45,9 @@ export default class Quiz extends React.Component {
     quiz.questions = questions;
 
     this.state = {
-      quiz:quiz,
-      current_question_index:1,
+        quiz: {...quiz, questions},
+        current_question_index: 0,
+        answeredQuestions: new Array(quiz.questions.length),
     };
   }
   componentDidMount(){
@@ -57,40 +61,80 @@ export default class Quiz extends React.Component {
 
   }
   onNextQuestion(){
-    let isLastQuestion = (this.state.current_question_index === this.state.quiz.questions.length);
-    if(isLastQuestion === false){
-      this.setState({current_question_index:(this.state.current_question_index + 1)});
-    } else {
-      this.props.dispatch(finishApp(true));
+    let isLastQuestion = (this.state.current_question_index === this.state.quiz.questions.length - 1);
+    let index =  isLastQuestion ? 0 : (this.state.current_question_index + 1);
+    const allTrue = arr => arr.filter(a=>a===1).length === arr.length;
+    if (allTrue(this.state.answeredQuestions)) {
+        this.props.dispatch(finishApp(true));
     }
+    this.setState({current_question_index: index});
+
   }
+    onPrevQuestion(){
+        let isFirstQuestion = (this.state.current_question_index === 0);
+        this.setState({current_question_index: isFirstQuestion ? (this.state.quiz.questions.length - 1) : (this.state.current_question_index - 1)});
+    }
+
+
+    onAnswerQuestion(e){
+        // Calculate score
+        let answeredQuestions = [...this.state.answeredQuestions];
+
+        let submittedAnswer = e;
+        let correctAnswer = this.state.quiz.questions[this.state.current_question_index];
+        let scorePercentage = 0;
+        if (answeredQuestions[this.state.current_question_index] !== undefined) {
+          return;
+        }
+        if (submittedAnswer === correctAnswer) {
+          scorePercentage = 1;
+        }
+        // Send data via SCORM
+        let objective = this.props.tracking.objectives["Question" + (this.state.current_question_index+1)];
+
+        this.props.dispatch(objectiveAccomplished(objective.id, objective.score * scorePercentage));
+        // this.props.dispatch(objectiveAccomplishedThunk(objective.id, objective.score * scorePercentage));
+        // Mark question as answered
+        answeredQuestions[this.state.current_question_index] = scorePercentage;
+        this.setState({answeredQuestions});
+        if (scorePercentage === 1) {
+            let onNextQuestion = this.onNextQuestion.bind(this);
+            onNextQuestion();
+        }
+
+    }
   onResetQuiz(){
-    this.setState({current_question_index:1});
+    this.setState({current_question_index:0});
     this.props.dispatch(resetObjectives());
   }
   render(){
-    let currentQuestion = this.state.quiz.questions[this.state.current_question_index - 1];
+    let currentQuestion = this.state.quiz.questions[this.state.current_question_index ];
     let isLastQuestion = (this.state.current_question_index === this.state.quiz.questions.length);
 
     let objective = this.props.tracking.objectives["Question" + (this.state.current_question_index)];
     let onNextQuestion = this.onNextQuestion.bind(this);
+    let onPrevQuestion = this.onPrevQuestion.bind(this);
     let onResetQuiz = this.onResetQuiz.bind(this);
+    let onAnswerQuestion = this.onAnswerQuestion.bind(this);
     let currentQuestionRender = "";
     currentQuestionRender = <span>{currentQuestion}</span>;
-    // switch (currentQuestion.type){
-    // case "multiple_choice":
-    // currentQuestionRender = (<MCQuestion question={currentQuestion} dispatch={this.props.dispatch} I18n={this.props.I18n} objective={objective} onNextQuestion={onNextQuestion} onResetQuiz={onResetQuiz} isLastQuestion={isLastQuestion} quizCompleted={this.props.tracking.finished}/>);
-
-    //   break;
-    // default:
-    //   currentQuestionRender = "Question type not supported";
-    // }
-
+    let guessed = [];
+    this.state.quiz.questions.map((q, i)=>{
+      if (this.state.answeredQuestions[i] === 1) {
+        guessed.push(q);
+      }
+    });
     return (
       <div className="quiz">
-        <QuizHeader I18n={this.props.I18n} quiz={this.state.quiz} currentQuestionIndex={this.state.current_question_index}/>
-        {currentQuestionRender}
-        <Mapa dispatch={this.props.dispatch}/>
+        <div id="nav">
+          <img src={maplogo} id="logo" alt=""/><span><span > map</span><span className="mainColor">GAME</span></span>
+          <div id="navBarRightContainer">
+          <Timer finish={this.props.finish} timeUp={()=>{this.props.dispatch(finishApp(true))}}/>
+          <Progress progress={this.props.tracking.progress_measure}/>
+          </div>
+        </div>
+        <GamePanel question={currentQuestion} onPrevQuestion={onPrevQuestion} onNextQuestion={onNextQuestion} finish={this.props.finish}/>
+        <Mapa onAnswerQuestion={onAnswerQuestion} answers={guessed}/>
       </div>
     );
   }
