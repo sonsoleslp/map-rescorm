@@ -11,7 +11,8 @@ export let GLOBAL_CONFIG = {
       completion_threshold:0.5,
       score_threshold:0.6,
     },
-    n:5,
+    n: undefined,
+    time: 1000*60*10,
   },
   production:{
     debug:false,
@@ -25,6 +26,7 @@ export let GLOBAL_CONFIG = {
       score_threshold:0.6,
     },
     n:undefined,
+    time: 1000*60*10,
   },
 };
 

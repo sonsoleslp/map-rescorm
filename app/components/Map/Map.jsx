@@ -16,6 +16,7 @@ export default class Map extends React.Component {
 
   render(){
     let map = this.props.data;
+    let finish = this.props.finish;
     let data = [];
       let handleMouseOver = this.handleMouseOver;
       let handleMouseOut = this.handleMouseOut;
@@ -31,23 +32,23 @@ export default class Map extends React.Component {
         path: map[key].path || "",
         xx: map[key].xx || 0,
         yy: map[key].yy || 0,
-        fill: value ? "#17CFC8": (map[key].backColor || "#333333") , // "#97d6f5",
+        fill: value ? "#17CFC8": (finish ? '#888': (map[key].backColor || "#333333")) , // "#97d6f5",
         stroke: map[key].borderColor || "#fff",
-        textFill: value ? map[key].textFill || "#000" : 'none',
-        textStroke: value ? map[key].textStroke : 'none',
+        textFill: (value || finish)? map[key].textFill || "#000" : 'none',
+        textStroke:  (value || finish) ? map[key].textStroke : 'none',
       });
     }
     return (<Paper width={this.props.width || 1000} height={this.props.height || 1000} viewbox={'150.522 11.305 416.74600000000004 348.17'}>
       {
         data.map(function(ele, pos){
-          return (<Shape data={ele} key={pos} mouseover={handleMouseOver} mouseout={handleMouseOut} click={handleClick}/>);
+          return (<Shape finish={finish} data={ele} key={pos} mouseover={handleMouseOver} mouseout={handleMouseOut} click={handleClick}/>);
         })
       }
-        {
-            data.map(function(ele, pos){
-                return (<Label data={ele} key={pos} mouseover={handleMouseOver} mouseout={handleMouseOut} click={handleClick}/>);
-            })
-        }
+      {
+          data.map(function(ele, pos){
+              return (<Label finish={finish} data={ele} key={pos} mouseover={handleMouseOver} mouseout={handleMouseOut} click={handleClick}/>);
+          })
+      }
     </Paper>);
   }
 }

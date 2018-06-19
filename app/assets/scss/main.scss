@@ -20,6 +20,9 @@ body {
 .mainColor {
   color: $maincolor;
 }
+.greyColor {
+  color: grey;
+}
 div.header_wrapper img {
   width: 71px;
   height: 50px;
@@ -61,30 +64,36 @@ div.header_wrapper img {
   color: white;
   #logo {
     height: 30px;
-    padding-right: 10px;
+    padding-right: 1px;
     vertical-align: text-bottom;
 
   }
   span {
-    vertical-align: middle;
+    vertical-align: initial;
   }
 }
 
 
 #gamePanel {
   position: absolute;
-  width: 250px;
+  width: 300px;
+  right: 3px;
   z-index: 9999;
-  margin: 10px;
+  margin: 5px 10px;
+  min-height:50px;
+  //line-height: 40px;
   //padding: 5px;
   background-color: white;
   display: flex;
   flex-flow: row wrap;
+  align-items: center;
+  justify-content: center;
   #question {
     text-align: center;
     flex: 2 0px;
     order: 2;
     padding: 6px;
+
   }
   * {
     flex: 1 100%;
@@ -99,7 +108,7 @@ div.header_wrapper img {
       outline: none;
       height: 100%;
       img {
-        width: 15px;
+        width: 25px;
         cursor:pointer;
         vertical-align: middle;
         &:hover {
@@ -133,6 +142,12 @@ div.header_wrapper img {
   }
 }
 
+@media (max-width: 420px) {
+ #brandName {
+   display:none;
+ }
+}
+
 #navBarRightContainer {
   display: inline-block;
   position: absolute;
@@ -164,6 +179,32 @@ div.header_wrapper img {
       height: 15px;
       font-size: 18px;
     }
-    margin-right: 4px;
+    margin-right: 12px;
   }
 }
+
+.modalView {
+  padding: 40px;
+  .center{
+    text-align: center;
+  }
+  .playButton {
+    cursor: pointer;
+    width: 100px;
+
+  }
+  .resetButton {
+    cursor: pointer;
+    width: 45px;
+  }
+  .pass {
+    color: forestgreen;
+
+  }
+  .fail {
+    color: red;
+  }
+}
+
+
+

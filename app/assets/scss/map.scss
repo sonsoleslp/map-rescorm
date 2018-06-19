@@ -1,15 +1,44 @@
-#map {
-  text-align: center;
+
+.mapContainer{
   height: calc(100% - 80px);
-  text {
-    font-size: 8px !important;
-    z-index: 9999 !important;
-    font-family: "Roboto" !important;
+  #map {
+    text-align: center;
+
+
+    text {
+      font-size: 8px !important;
+      z-index: 9999 !important;
+      font-family: "Roboto" !important;
+    }
+  }
+}
+@media (max-width: 600px) {
+  .mapContainer {
+    height: calc(100% - 115px);
   }
 }
 
-@media (max-width: 600px) {
-  #map  {
-    height: calc(100% - 115px);
+#zoomButtons {
+  position:fixed;
+  right: 0;
+  bottom: 0;
+  margin: 10px;
+  background-color: white;
+  width: 40px;
+  height:80px;
+  .zoomButton {
+    width: 40px;
+    height:40px;
+    line-height: 40px;
+    font-size: 20px;
+    &:hover{
+      transform: scale(1.5);
+      cursor:pointer;
+    }
+    #closer {
+    }
+    #farther {
+    }
   }
+
 }

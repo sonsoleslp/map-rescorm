@@ -9,7 +9,12 @@ import Mapa from './Map/Mapa';
 import GamePanel from './GamePanel';
 import Progress from './Progress';
 import Timer from './Timer';
-import maplogo from '../assets/images/map.svg'
+import ModalStart from './modals/ModalStart';
+import ModalFinish from './modals/ModalFinish';
+
+import maplogo from '../assets/images/map.svg';
+
+
 export default class Quiz extends React.Component {
   constructor(props){
     super(props);
@@ -37,6 +42,9 @@ export default class Quiz extends React.Component {
       questions = Utils.shuffleArray(questions);
     }
     */
+
+    let difficulty = props.user_profile.learner_preference.difficulty;
+    console.log(difficulty);
     if((typeof this.props.config.n === "number") && (this.props.config.n >= 1)){
       // Limit number of questions
       questions = questions.slice(0, Math.min(this.props.config.n, questions.length));
@@ -45,6 +53,8 @@ export default class Quiz extends React.Component {
     quiz.questions = questions;
 
     this.state = {
+        start: false,
+        showFinishModal: true,
         quiz: {...quiz, questions},
         current_question_index: 0,
         answeredQuestions: new Array(quiz.questions.length),
@@ -75,17 +85,18 @@ export default class Quiz extends React.Component {
         this.setState({current_question_index: isFirstQuestion ? (this.state.quiz.questions.length - 1) : (this.state.current_question_index - 1)});
     }
 
-
     onAnswerQuestion(e){
         // Calculate score
-        let answeredQuestions = [...this.state.answeredQuestions];
 
         let submittedAnswer = e;
         let correctAnswer = this.state.quiz.questions[this.state.current_question_index];
         let scorePercentage = 0;
-        if (answeredQuestions[this.state.current_question_index] !== undefined) {
+        let answeredQuestions = [...this.state.answeredQuestions];
+
+        if (this.props.finish || answeredQuestions[this.state.current_question_index] === 1) { //!== undefined Solo 1 oportunidad
           return;
         }
+
         if (submittedAnswer === correctAnswer) {
           scorePercentage = 1;
         }
@@ -104,7 +115,8 @@ export default class Quiz extends React.Component {
 
     }
   onResetQuiz(){
-    this.setState({current_question_index:0});
+    this.setState({current_question_index:0, showFinishModal: false,
+      answeredQuestions: new Array(this.state.quiz.questions.length)});
     this.props.dispatch(resetObjectives());
   }
   render(){
@@ -116,25 +128,29 @@ export default class Quiz extends React.Component {
     let onPrevQuestion = this.onPrevQuestion.bind(this);
     let onResetQuiz = this.onResetQuiz.bind(this);
     let onAnswerQuestion = this.onAnswerQuestion.bind(this);
-    let currentQuestionRender = "";
-    currentQuestionRender = <span>{currentQuestion}</span>;
     let guessed = [];
     this.state.quiz.questions.map((q, i)=>{
       if (this.state.answeredQuestions[i] === 1) {
         guessed.push(q);
       }
     });
+    let start = this.state.start && !this.props.finish;
     return (
       <div className="quiz">
         <div id="nav">
-          <img src={maplogo} id="logo" alt=""/><span><span > map</span><span className="mainColor">GAME</span></span>
+          <img src={maplogo} id="logo" alt=""/><span id="brandName"><span> map</span><span className="mainColor">GAME</span></span>
           <div id="navBarRightContainer">
-          <Timer finish={this.props.finish} timeUp={()=>{this.props.dispatch(finishApp(true))}}/>
-          <Progress progress={this.props.tracking.progress_measure}/>
+            {start ? <Timer config={this.props.config} finish={this.props.finish} timeUp={()=>{this.props.dispatch(finishApp(true))}}/> : null}
+            {start ? <Progress progress={this.props.tracking.progress_measure}/>: null}
           </div>
         </div>
-        <GamePanel question={currentQuestion} onPrevQuestion={onPrevQuestion} onNextQuestion={onNextQuestion} finish={this.props.finish}/>
-        <Mapa onAnswerQuestion={onAnswerQuestion} answers={guessed}/>
+        {start ? <GamePanel question={currentQuestion}
+                   onPrevQuestion={onPrevQuestion}
+                   onNextQuestion={onNextQuestion}
+                   finish={this.props.finish}/> : null}
+        <Mapa onAnswerQuestion={onAnswerQuestion} answers={guessed} finish={this.props.finish}/>
+        <ModalStart open={!this.state.start} start={()=>{this.setState({start: true})}} onClose={()=>null}/>
+        <ModalFinish open={this.props.finish && this.state.showFinishModal} correct={this.state.answeredQuestions.filter(a=>a===1).length} progress={this.props.tracking.progress_measure*100} total={this.state.quiz.questions.length} reset={onResetQuiz.bind(this)} onClose={()=>{this.setState({showFinishModal: false})}}/>
       </div>
     );
   }
