@@ -44,8 +44,10 @@ export default class Quiz extends React.Component {
     */
 
     let difficulty = props.user_profile.learner_preference.difficulty;
-    console.log(difficulty);
-    if((typeof this.props.config.n === "number") && (this.props.config.n >= 1)){
+    let easy = !difficulty || difficulty <= 5;
+    easy = false;
+    console.log(difficulty, easy);
+    if(easy && (typeof this.props.config.n === "number") && (this.props.config.n >= 1)){
       // Limit number of questions
       questions = questions.slice(0, Math.min(this.props.config.n, questions.length));
     }
@@ -55,6 +57,7 @@ export default class Quiz extends React.Component {
     this.state = {
         start: false,
         showFinishModal: true,
+        easy,
         quiz: {...quiz, questions},
         current_question_index: 0,
         answeredQuestions: new Array(quiz.questions.length),
@@ -128,6 +131,7 @@ export default class Quiz extends React.Component {
     let onPrevQuestion = this.onPrevQuestion.bind(this);
     let onResetQuiz = this.onResetQuiz.bind(this);
     let onAnswerQuestion = this.onAnswerQuestion.bind(this);
+    let checkProvince = this.checkProvince.bind(this);
     let guessed = [];
     this.state.quiz.questions.map((q, i)=>{
       if (this.state.answeredQuestions[i] === 1) {
@@ -144,14 +148,39 @@ export default class Quiz extends React.Component {
             {start ? <Progress progress={this.props.tracking.progress_measure}/>: null}
           </div>
         </div>
-        {start ? <GamePanel question={currentQuestion}
+        {start ? <GamePanel question={currentQuestion} easy={this.state.easy}
                    onPrevQuestion={onPrevQuestion}
                    onNextQuestion={onNextQuestion}
+                   checkProvince={checkProvince}
                    finish={this.props.finish}/> : null}
         <Mapa onAnswerQuestion={onAnswerQuestion} answers={guessed} finish={this.props.finish}/>
         <ModalStart open={!this.state.start} start={()=>{this.setState({start: true})}} onClose={()=>null}/>
         <ModalFinish open={this.props.finish && this.state.showFinishModal} correct={this.state.answeredQuestions.filter(a=>a===1).length} progress={this.props.tracking.progress_measure*100} total={this.state.quiz.questions.length} reset={onResetQuiz.bind(this)} onClose={()=>{this.setState({showFinishModal: false})}}/>
       </div>
     );
+  }
+  checkProvince(province) {
+      let matches = false;
+      for (let i in this.state.quiz.questions) {
+        let q = this.state.quiz.questions[i];
+        if(q === province && this.state.answeredQuestions[i] !== 1 && !this.props.finish) {
+          matches = true;
+          let scorePercentage = 1;
+          let answeredQuestions = [...this.state.answeredQuestions];
+          // Send data via SCORM
+          console.log(this.props.tracking.objectives)
+          let index = "Question" + (+i+1)
+          let objective = this.props.tracking.objectives[index];
+          console.log(i, objective, index)
+          this.props.dispatch(objectiveAccomplished(objective.id, objective.score * scorePercentage));
+          // Mark question as answered
+          answeredQuestions[i] = scorePercentage;
+          this.setState({answeredQuestions});
+          let onNextQuestion = this.onNextQuestion.bind(this)
+          onNextQuestion();
+          break;
+        }
+      }
+      return matches;
   }
 }

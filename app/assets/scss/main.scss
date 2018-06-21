@@ -88,6 +88,15 @@ div.header_wrapper img {
   flex-flow: row wrap;
   align-items: center;
   justify-content: center;
+  input {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    padding: 13px;
+    outline: none;
+    font-family: Roboto;
+  }
   #question {
     text-align: center;
     flex: 2 0px;
@@ -205,6 +214,7 @@ div.header_wrapper img {
     color: red;
   }
 }
+
 
 
 
