@@ -22,7 +22,7 @@ export default class GamePanel extends React.Component {
                 <div className="rightarrow arrow"><button onClick={this.props.onNextQuestion}><img src={right} alt=""/></button></div>
             </div>) : (
             <div id="gamePanel">
-                <input type="text" value={this.state.province} onChange={this.checkProvince.bind(this)}/>
+                <input type="text" placeholder={"Escribe aqui el nombre de la provincia"} value={this.state.province} onChange={this.checkProvince.bind(this)}/>
             </div>)
         );
         

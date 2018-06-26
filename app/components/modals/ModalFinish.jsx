@@ -6,7 +6,7 @@ export default class ModalFinish extends React.Component {
 
   render() {
     return (
-      <Modal center open={this.props.open} animationDuration={300} onClose={this.props.onClose}  classNames={{modal:"modalView"}}>
+      <Modal center open={this.props.open} animationDuration={300} onClose={this.props.onClose} classNames={{modal:"modalView"}}>
         <h2>¡Has terminado!</h2>
         <div>Has acertado {this.props.correct} de {this.props.total} provincias.</div>
         <div className={this.props.progress >= 50 ? 'pass':'fail'}>({Math.round(this.props.progress*100)/100}% de aciertos)</div>
@@ -15,6 +15,8 @@ export default class ModalFinish extends React.Component {
           <img src={reset} onClick={this.props.reset} className={"resetButton"} alt=""/>
           <div className="greyColor">Reiniciar</div>
         </div>*/}
+        <p className="credits">Juego creado por <a href="https://github.com/sonsoleslp">@sonsoleslp</a> empleando <a href="https://github.com/agordillo/RESCORM">RESCORM</a></p>
+
       </Modal>
     );
   }

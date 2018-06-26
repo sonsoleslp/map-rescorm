@@ -213,6 +213,22 @@ div.header_wrapper img {
   .fail {
     color: red;
   }
+  &.modalStart {
+    h1, h2, h3 {
+      font-weight: normal !important;
+    }
+
+  }
+  .credits {
+    color: grey;
+    font-size: 13px;
+    text-align: right;
+    margin-bottom: -25px;
+    a {
+      color: $maincolor;
+      text-decoration: none;
+    }
+  }
 }
 
 

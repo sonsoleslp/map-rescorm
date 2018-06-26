@@ -21,33 +21,9 @@ export default class Quiz extends React.Component {
     let quiz = this.props.quiz;
     let questions = [...quiz.questions];
 
-    // Adaptive behaviour
-    // Sort questions based on difficulty
-   /* let adaptive_sorted = false;
-    if((this.props.config.adaptive === true) && (typeof props.user_profile === "object") && (typeof props.user_profile.learner_preference === "object") && (typeof props.user_profile.learner_preference.difficulty === "number")){
-      let difficulty = props.user_profile.learner_preference.difficulty;
-      if((difficulty >= 0) && (difficulty <= 10)){
-        for(let i = 0; i < questions.length; i++){
-          if((typeof questions[i].difficulty !== "number") || (questions[i].difficulty < 0) || (questions[i].difficulty > 10)){
-            questions[i].difficulty = 5;
-          }
-          questions[i].suitability = (10 - Math.abs((questions[i].difficulty - difficulty))) / 10;
-        }
-        questions.sort(function(a, b){ return b.suitability - a.suitability; });
-        adaptive_sorted = true;
-      }
-    }*/
-
-   /* if(adaptive_sorted === false){
-      questions = Utils.shuffleArray(questions);
-    }
-    */
-
     let difficulty = props.user_profile.learner_preference.difficulty;
-    let easy = !difficulty || difficulty <= 5;
-    easy = false;
-    console.log(difficulty, easy);
-    if(easy && (typeof this.props.config.n === "number") && (this.props.config.n >= 1)){
+    let easy = !difficulty || difficulty < 5;
+    if( (typeof this.props.config.n === "number") && (this.props.config.n >= 1)){
       // Limit number of questions
       questions = questions.slice(0, Math.min(this.props.config.n, questions.length));
     }
@@ -100,7 +76,7 @@ export default class Quiz extends React.Component {
           return;
         }
 
-        if (submittedAnswer === correctAnswer) {
+        if (submittedAnswer && correctAnswer && submittedAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
           scorePercentage = 1;
         }
         // Send data via SCORM
@@ -153,34 +129,55 @@ export default class Quiz extends React.Component {
                    onNextQuestion={onNextQuestion}
                    checkProvince={checkProvince}
                    finish={this.props.finish}/> : null}
-        <Mapa onAnswerQuestion={onAnswerQuestion} answers={guessed} finish={this.props.finish}/>
-        <ModalStart open={!this.state.start} start={()=>{this.setState({start: true})}} onClose={()=>null}/>
+        <Mapa onAnswerQuestion={(e)=>{
+          if(this.state.easy) {
+             onAnswerQuestion(e);
+          }
+        }} answers={guessed} finish={this.props.finish} currentQuestion={this.state.easy ? undefined : this.state.quiz.questions[this.state.current_question_index]}/>
+        <ModalStart easy={this.state.easy} open={!this.state.start} start={()=>{this.setState({start: true})}} onClose={()=>null}/>
         <ModalFinish open={this.props.finish && this.state.showFinishModal} correct={this.state.answeredQuestions.filter(a=>a===1).length} progress={this.props.tracking.progress_measure*100} total={this.state.quiz.questions.length} reset={onResetQuiz.bind(this)} onClose={()=>{this.setState({showFinishModal: false})}}/>
       </div>
     );
   }
   checkProvince(province) {
       let matches = false;
-      for (let i in this.state.quiz.questions) {
-        let q = this.state.quiz.questions[i];
-        if(q === province && this.state.answeredQuestions[i] !== 1 && !this.props.finish) {
+      if (this.state.easy) {
+        for (let i in this.state.quiz.questions) {
+          let q = this.state.quiz.questions[i].toLowerCase();
+          if(q === province && this.state.answeredQuestions[i] !== 1 && !this.props.finish) {
+            matches = true;
+            let scorePercentage = 1;
+            let answeredQuestions = [...this.state.answeredQuestions];
+            // Send data via SCORM
+            let index = "Question" + (+i+1)
+            let objective = this.props.tracking.objectives[index];
+            this.props.dispatch(objectiveAccomplished(objective.id, objective.score * scorePercentage));
+            // Mark question as answered
+            answeredQuestions[i] = scorePercentage;
+            this.setState({answeredQuestions});
+            let onNextQuestion = this.onNextQuestion.bind(this)
+            onNextQuestion();
+            break;
+          }
+        }
+      } else {
+        let q = this.state.quiz.questions[this.state.current_question_index].toLowerCase();
+        if(q === (province || "").toLowerCase() && this.state.answeredQuestions[this.state.current_question_index] !== 1 && !this.props.finish) {
           matches = true;
           let scorePercentage = 1;
           let answeredQuestions = [...this.state.answeredQuestions];
           // Send data via SCORM
-          console.log(this.props.tracking.objectives)
-          let index = "Question" + (+i+1)
+          let index = "Question" + (+this.state.current_question_index+1)
           let objective = this.props.tracking.objectives[index];
-          console.log(i, objective, index)
           this.props.dispatch(objectiveAccomplished(objective.id, objective.score * scorePercentage));
           // Mark question as answered
-          answeredQuestions[i] = scorePercentage;
+          answeredQuestions[this.state.current_question_index] = scorePercentage;
           this.setState({answeredQuestions});
           let onNextQuestion = this.onNextQuestion.bind(this)
           onNextQuestion();
-          break;
         }
       }
+
       return matches;
   }
 }

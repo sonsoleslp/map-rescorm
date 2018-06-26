@@ -17,7 +17,7 @@ export default class Mapa extends React.Component {
   render(){
     return <div className="mapContainer">
       <div id="map" style={{transform: 'scale(' + this.props.scale + ')'}}>
-      <Map finish={this.props.finish} answers={this.props.answers} data={spain} width={this.state.width} height={this.state.height} handleClick={this.props.onAnswerQuestion}/>
+      <Map finish={this.props.finish} currentQuestion={this.props.currentQuestion} answers={this.props.answers} data={spain} width={this.state.width} height={this.state.height} handleClick={this.props.onAnswerQuestion}/>
 
      {/* <div id="zoomButtons">
         <div className="zoomButton" id="closer" onClick={()=>{this.scale(true)}}>+</div>
